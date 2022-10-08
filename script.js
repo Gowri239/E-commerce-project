@@ -49,3 +49,27 @@ parentContainer.addEventListener('click',(e)=>{
         document.querySelector('#cart').style = "display:none;"
     }
 })
+
+
+window.addEventListener('DOMContentLoaded',()=>{
+    axios.get("http://localhost:3000/products").then((data) =>{
+        console.log(data)
+        if(data.request.status === 200){
+            const products = data.data.products;
+            const parentSection = document.getElementById('Products')
+            products.forEach(product => {
+                const productHTML = `
+                <div>
+                    <h1>${product.title}</h1>
+                    <img src=${product.imageUrl}></img>
+                    <button>Add To Cart</button>
+                </div>`
+
+                parentSection.innerHTML += productHTML
+
+                
+            });
+        }
+
+    })
+})
