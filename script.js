@@ -43,7 +43,10 @@ parentContainer.addEventListener('click',(e)=>{
         },2500)
     }
     if (e.target.className=='cart-btn-bottom' || e.target.className=='cart-bottom' || e.target.className=='cart-holder'){
-        document.querySelector('#cart').style = "display:block;"
+        const cartContainer = document.getElementById('cart')
+        cartContainer.innerHTML = `<li>${product.title}`
+        getcartDetails()
+       // document.querySelector('#cart').style = "display:block;"
     }
     if (e.target.className=='cancel'){
         document.querySelector('#cart').style = "display:none;"
@@ -79,16 +82,38 @@ function addToCart(productId){
         .then((response) => {
             if(response.status === 200){
                 notifyUsers(response.data.message)
+            }else{
+                throw new Error(response.data.message)
             }
         })
-        .catch((err) => console.log(err))
+        .catch((errMsg) => {
+            console.log(errMsg)
+            notifyUsers(errMsg)
+        })
+}
+
+function getcartDetails(){
+    axios.get("http://localhost:3000/cart")
+        .then((response) => {
+            if(response.status===200){
+                response.data.product.forEach(product =>{
+                    const cartContainer = document.getElementById('cart')
+                    cartContainer.innerHTML = `<li>${product.title}</li>`
+                })
+                document.querySelector('#cart').style = "display:block;" 
+            }else{
+                throw new Error('something went wrong')
+
+            }
+        })
+        .catch(err => notifyUsers(err))
 }
 
 function notifyUsers(message){
     const container = document.getElementById('container');
     const notification = document.createElement('div');
     notification.classList.add('notification');
-    notification.innerHTML = `<h4>Your Product : <span>${message.title}</span> is added to the cart<h4>`;
+    notification.innerHTML = `${message}`;
     container.appendChild(notification);
     setTimeout(()=>{
         notification.remove();
